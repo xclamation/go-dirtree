@@ -1,0 +1,170 @@
+package main
+
+import (
+	"fmt"
+	"io"
+	"os"
+	"path/filepath"
+	"strings"
+)
+
+func dirTreeRec(out io.Writer, path string, printFiles bool, level int, folderPrefix *strings.Builder) error {
+	files, err := os.ReadDir(path)
+	if err != nil {
+		return err
+	}
+	var prefix strings.Builder
+
+	var prefixedPath strings.Builder
+
+	for i, entity := range files {
+		prefix.Reset()
+		prefixedPath.Reset()
+		//prefix.WriteString("│")
+		for i := 0; i < level; i++ {
+			prefix.WriteString("\t")
+		}
+
+		if i == len(files)-1 {
+			prefix.WriteString("\t")
+			prefix.WriteString("└───")
+		} else {
+			prefix.WriteString("│\t")
+			prefix.WriteString("├───")
+		}
+
+		prefixedPath.WriteString(prefix.String())
+		prefixedPath.WriteString(entity.Name())
+		fmt.Fprintln(out, prefixedPath.String())
+		if entity.Type().IsDir() {
+			dirTreeRec(out, filepath.Join(path, entity.Name()), printFiles, level+1, mainPrefix)
+		}
+	}
+
+	// fmt.Println(files)
+	// fmt.Println(path)
+	// fullpath := filepath.Join(path, files[5].Name())
+	// dirTreeRec(out, fullpath, printFiles, level+1)
+	//fmt.Println(fullpath)
+	return nil
+}
+
+func dirTree(out io.Writer, path string, printFiles bool) error {
+	var mainPrefix strings.Builder
+	return dirTreeRec(out, path, printFiles, 0, &mainPrefix)
+}
+
+func main() {
+	out := os.Stdout
+	if !(len(os.Args) == 2 || len(os.Args) == 3) {
+		panic("usage go run main.go . [-f]")
+	}
+	path := os.Args[1]
+	printFiles := len(os.Args) == 3 && os.Args[2] == "-f"
+	err := dirTree(out, path, printFiles)
+	if err != nil {
+		panic(err.Error())
+	}
+}
+
+
+
+package main
+
+import (
+	"fmt"
+	"io"
+	"os"
+	"path/filepath"
+	"strings"
+)
+
+func dirTreeRec(out io.Writer, path string, printFiles bool, level int, mainPrefix string) error {
+	files, err := os.ReadDir(path)
+	if err != nil {
+		return err
+	}
+	//var newBuilder strings.Builder
+	//newBuilder.WriteString(mainPrefix.String())
+	var prefix strings.Builder
+	//prefix.WriteString()
+	var prefixedPath strings.Builder
+
+	for i, entity := range files {
+		prefix.Reset()
+		prefix.WriteString(newBuilder.String())
+		prefix
+		//folderPrefix.Reset()
+		prefixedPath.Reset()
+		//prefix.WriteString("│")
+		// for j := 0; j < level; j++ {
+		// 	if lastFolder {
+		// 		prefix.WriteString("\t")
+		// 		//prefix.WriteString("└───")
+		// 	} else {
+		// 		prefix.WriteString("|\t")
+		// 	}
+		// }
+
+		if i == len(files)-1 {
+			//prefix.WriteString("\t")
+			prefix.WriteString("└───")
+		} else {
+			//prefix.WriteString("│\t")
+			prefix.WriteString("├───")
+		}
+
+		prefixedPath.WriteString(prefix.String())
+		prefixedPath.WriteString(entity.Name())
+		fmt.Fprintln(out, prefixedPath.String())
+		//fmt.Fprintln(out, newBuilder)
+		if entity.Type().IsDir() {
+			if i == len(files)-1 {
+				newBuilder.WriteString("\t")
+			} else {
+				newBuilder.WriteString("|\t")
+			}
+			dirTreeRec(out, filepath.Join(path, entity.Name()), printFiles, level+1, newBuilder)
+		}
+	}
+
+	// fmt.Println(files)
+	// fmt.Println(path)
+	// fullpath := filepath.Join(path, files[5].Name())
+	// dirTreeRec(out, fullpath, printFiles, level+1)
+	//fmt.Println(fullpath)
+	return nil
+}
+
+func dirTree(out io.Writer, path string, printFiles bool) error {
+	var mainPrefix strings.Builder
+	// files, err := os.ReadDir(path)
+	// if err != nil {
+	// 	return err
+	// }
+	// if len(files) == 0 {
+	// 	//fmt.Println("Path is empty!")
+	// 	return errors.New("path is empty!")
+	// }
+	// lastFolder := false
+	// if len(files) == 1 {
+	// 	if files[0].Type().IsDir() {
+	// 		lastFolder = true
+	// 	}
+
+	// }
+	return dirTreeRec(out, path, printFiles, 0, mainPrefix)
+}
+
+func main() {
+	out := os.Stdout
+	if !(len(os.Args) == 2 || len(os.Args) == 3) {
+		panic("usage go run main.go . [-f]")
+	}
+	path := os.Args[1]
+	printFiles := len(os.Args) == 3 && os.Args[2] == "-f"
+	err := dirTree(out, path, printFiles)
+	if err != nil {
+		panic(err.Error())
+	}
+}
